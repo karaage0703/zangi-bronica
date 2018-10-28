@@ -5,7 +5,7 @@ import os
 from time import sleep
 
 shutter_numb = 0
-photo_dir = os.path.expanduser('~/photo_data')
+photo_dir = os.path.expanduser('/home/pi/photo_data')
 preview_time = 2
 
 def photodirCheck():

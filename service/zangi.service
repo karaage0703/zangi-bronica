@@ -1,0 +1,8 @@
+[Unit]
+Description=zangi bronica service
+[Service]
+ExecStart=/home/pi/zangi-bronica/zangi_boot.sh
+Restart = no
+Type=simple
+[Install]
+WantedBy=multi-user.target
