@@ -19,6 +19,7 @@ print ("Framebuffer size: %d x %d" % (size[0], size[1]))
 screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
 title_font = pygame.font.Font(os.path.join('/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'), 48)
 body_font = pygame.font.Font(os.path.join('/usr/share/fonts/truetype/fonts-japanese-gothic.ttf'), 32)
+fpsclock = pygame.time.Clock()
 # ----------- GUI
 
 def screen_clear():

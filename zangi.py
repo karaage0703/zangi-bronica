@@ -32,23 +32,25 @@ def go_home():
 
 def cb_shutter(gpio, level, tick):
     # print (gpio, level, tick)
-    if KeepWatchForSeconds(5, gpio):
-        CallShutdown()
+    if KeepWatchForSeconds(0.5, gpio):
+        if KeepWatchForSeconds(5, gpio):
+            CallShutdown()
 
-    else:
-        if gui.hmi_state == gui.PRVIEW_STATE:
-            go_home()
         else:
-            gui.screen_shutter()
-            sh.cameraLoad()
-            sh.shutter()
-            # sh.shutter_small()
-            sh.cameraSave()
-            go_home()
+            if gui.hmi_state == gui.PRVIEW_STATE:
+                go_home()
+            else:
+                gui.screen_shutter()
+                sh.cameraLoad()
+                sh.shutter()
+                # sh.shutter_small()
+                sh.cameraSave()
+                go_home()
 
 def cb_preview(gpio, level, tick):
     # print (gpio, level, tick)
-    preview()
+    if KeepWatchForSeconds(0.5, gpio):
+        preview()
 
 def KeepWatchForSeconds(seconds, pin_numb):
     GoFlag = True
@@ -95,4 +97,4 @@ if __name__ == '__main__':
     gui.screen_home()
 
     while loop == True:
-        pass
+        gui.fpsclock.tick(10)
