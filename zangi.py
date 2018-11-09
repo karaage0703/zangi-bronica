@@ -40,12 +40,18 @@ def cb_shutter(gpio, level, tick):
             if gui.hmi_state == gui.PRVIEW_STATE:
                 go_home()
             else:
-                gui.screen_shutter()
-                sh.cameraLoad()
-                sh.shutter()
-                # sh.shutter_small()
-                sh.cameraSave()
-                go_home()
+                if sh.shutter_state == 0:
+                    sh.camera.start_preview()
+                    sh.shutter_state = 1
+                else:
+                    sh.camera.stop_preview()
+                    gui.screen_shutter()
+                    sh.cameraLoad()
+                    sh.shutter()
+                    sh.cameraSave()
+                    time.sleep(3)
+                    go_home()
+                    sh.shutter_state = 0
 
 def cb_preview(gpio, level, tick):
     # print (gpio, level, tick)

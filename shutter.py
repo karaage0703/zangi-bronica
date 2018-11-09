@@ -8,6 +8,11 @@ shutter_numb = 0
 photo_dir = os.path.expanduser('/home/pi/photo_data')
 preview_time = 2
 
+camera = picamera.PiCamera()
+camera.resolution = (2592,1944)
+
+shutter_state = 0
+
 def photodirCheck():
     if os.path.isdir(photo_dir):
         print("photo directory is already existed")
@@ -41,34 +46,9 @@ def shutter():
     photofile = open(filename, 'wb')
     print(photofile)
 
-    with picamera.PiCamera() as camera:
-        camera.resolution = (2592,1944)
-        # camera.brightness = 50
-        # camera.flash_mode = 'on'
-        # camera.exposure_compensation = 0
-        camera.start_preview()
-        sleep(preview_time)
-        camera.capture(photofile)
-
+    camera.capture(photofile)
     photofile.close()
-
-def shutter_small():
-    global shutter_numb
-    shutter_numb +=1
-
-    filename = os.path.join(photo_dir, str("{0:06d}".format(shutter_numb)) + '.jpg')
-    photofile = open(filename, 'wb')
-    print(photofile)
-
-    with picamera.PiCamera() as camera:
-        camera.resolution = (320,240)
-        # camera.resolution = (259,194)
-        camera.start_preview()
-        sleep(3.000)
-        camera.capture(photofile)
-
-    photofile.close()
-
+    # camera.stop_preview()
 
 if __name__ == '__main__':
     cameraLoad()
