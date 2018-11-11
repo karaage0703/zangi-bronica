@@ -7,6 +7,9 @@ import pigpio
 import syslog
 import shutter as sh
 import zangi_gui as gui
+import pygame
+from pygame.locals import *
+import sys
 
 # global
 SleepStepSec = 0.1
@@ -25,12 +28,15 @@ pi.set_mode(preview_button, pigpio.INPUT)
 pi.set_pull_up_down(shutter_button, pigpio.PUD_UP)
 pi.set_pull_up_down(preview_button, pigpio.PUD_UP)
 
+shutter_state = 0
+
 def go_home():
     global preview_numb
     preview_numb = sh.shutter_numb
     gui.screen_home()
 
 def cb_shutter(gpio, level, tick):
+    global shutter_state
     # print (gpio, level, tick)
     if KeepWatchForSeconds(0.5, gpio):
         if KeepWatchForSeconds(5, gpio):
@@ -40,18 +46,18 @@ def cb_shutter(gpio, level, tick):
             if gui.hmi_state == gui.PRVIEW_STATE:
                 go_home()
             else:
-                if sh.shutter_state == 0:
+                if shutter_state == 0:
                     sh.camera.start_preview()
-                    sh.shutter_state = 1
+                    shutter_state = 1
                 else:
                     sh.camera.stop_preview()
                     gui.screen_shutter()
-                    sh.cameraLoad()
+                    # sh.cameraLoad()
                     sh.shutter()
-                    sh.cameraSave()
-                    time.sleep(3)
+                    # sh.cameraSave()
+                    time.sleep(2)
                     go_home()
-                    sh.shutter_state = 0
+                    shutter_state = 0
 
 def cb_preview(gpio, level, tick):
     # print (gpio, level, tick)
@@ -70,6 +76,7 @@ def KeepWatchForSeconds(seconds, pin_numb):
 
 def CallShutdown():
     print("Going shutdown by GPIO.")
+    sh.camera.close()
     syslog.syslog(syslog.LOG_NOTICE, "Going shutdown by GPIO.")
     os.system("/sbin/shutdown -h now 'Poweroff by GPIO'")
 
@@ -90,12 +97,10 @@ cb1 = pi.callback(shutter_button, pigpio.FALLING_EDGE, cb_shutter)
 cb2 = pi.callback(preview_button, pigpio.FALLING_EDGE, cb_preview)
 
 if __name__ == '__main__':
-    sh.photodirCheck()
-
     if not pi.connected:
         exit()
 
-    sh.cameraLoad()
+    sh.loadFile()
     preview_numb = sh.shutter_numb
 
     gui.screen_opening()
@@ -104,3 +109,8 @@ if __name__ == '__main__':
 
     while loop == True:
         gui.fpsclock.tick(10)
+        for event in pygame.event.get():
+            if event.type == KEYDOWN:
+                if event.key == K_ESCAPE:
+                    sh.camera.close()
+                    sys.exit()

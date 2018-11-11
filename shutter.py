@@ -6,51 +6,59 @@ from time import sleep
 
 shutter_numb = 0
 photo_dir = os.path.expanduser('/home/pi/photo_data')
-preview_time = 2
 
 camera = picamera.PiCamera()
-camera.resolution = (2592,1944)
 
-shutter_state = 0
+def setting():
+    camera.resolution = (2592,1944)
+    # camera.brightness = 50
+    # camera.flash_mode = 'on'
+    # camera.exposure_compensation = 0
 
-def photodirCheck():
+def preview(preview_time = 3):
+    camera.start_preview()
+    sleep(preview_time)
+    camera.stop_preview()
+
+def loadFile():
+    global shutter_numb
+
     if os.path.isdir(photo_dir):
-        print("photo directory is already existed")
+        pass
     else:
         print("make photo directory")
         os.mkdir(photo_dir)
 
-def cameraLoad():
-    global shutter_numb
     filename = os.path.join(photo_dir, 'camera.set')
-    try:
+
+    with open(filename) as fp:
         fp = open(filename)
         tmp_shutter_numb = fp.readlines()
-        tmp2_shutter_numb = tmp_shutter_numb[0].rstrip()
-        shutter_numb = int(tmp2_shutter_numb)
-        fp.close()
-    except IOError:
-        print('no camera.set data, make set files')
-
-def cameraSave():
-    filename = os.path.join(photo_dir, 'camera.set')
-    fp = open(filename, 'w')
-    fp.write(str(shutter_numb))
-    fp.close()
+        tmp_shutter_numb = tmp_shutter_numb[0].rstrip()
+        shutter_numb = int(tmp_shutter_numb)
 
 def shutter():
     global shutter_numb
+
+    # load shutter number from setting file
+    loadFile()
+
+    filename = os.path.join(photo_dir, 'camera.set')
+
     shutter_numb +=1
 
-    filename = os.path.join(photo_dir, str("{0:06d}".format(shutter_numb)) + '.jpg')
-    photofile = open(filename, 'wb')
-    print(photofile)
+    # write shutter number to setting file
+    with open(filename, mode='w') as fp:
+        fp.write(str(shutter_numb))
 
-    camera.capture(photofile)
-    photofile.close()
-    # camera.stop_preview()
+    # take photo
+    filename = os.path.join(photo_dir, str("{0:06d}".format(shutter_numb)) + '.jpg')
+    print(filename)
+    with open(filename, mode='wb') as fp:
+        camera.capture(fp)
 
 if __name__ == '__main__':
-    cameraLoad()
+    setting()
+    preview()
     shutter()
-    cameraSave()
+    camera.close()
