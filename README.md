@@ -38,7 +38,7 @@ $ cd ~/zangi-bronica
 $ python3 zangi.py
 ```
 
-# Licence
+# License
 This software is released under the MIT License, see LICENSE.
 
 # Authors
