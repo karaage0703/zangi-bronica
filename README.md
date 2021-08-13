@@ -1,6 +1,9 @@
 # zangi-bronica
 Digital Bag system for ZENZA BRONICA by using Raspberry Pi
 
+![images](images/zangi-bronica_02.jpg)
+![images](images/zangi-bronica_01.jpg)
+
 # Dependency
 - Python3 and Python2(Python3 is recommended)
 - picamera
